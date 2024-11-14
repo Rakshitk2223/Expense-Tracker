@@ -1,0 +1,124 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Header Styles */
+  header {
+  background-color: #FF8C00; 
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+  
+  header h1 {
+    margin: 0;
+  }
+  
+  /* Navigation Styles */
+  nav {
+    background-color: #333;
+    overflow: hidden;
+  }
+  
+  nav a {
+    float: left;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+  nav a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  /* Dashboard Styles */
+  #chartContainer {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+  }
+  
+  #expenseChart {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+  }
+  
+  .transaction-table th,
+  .transaction-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .transaction-table th {
+    background-color: #f2f2f2;
+  }
+  
+  /* Transaction Form Styles */
+  .transaction-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+  }
+  
+  .transaction-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .transaction-form input,
+  .transaction-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+  }
+  
+  .transaction-form button {
+    background-color: #FF8C00;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .transaction-form button:hover {
+    background-color: #FF8C00;
+  }
+  
+  /* Footer Styles */
+  footer {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+  }
