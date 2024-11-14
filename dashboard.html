@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Expense Tracker</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+    .navbar a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #333;
+      text-align: center;
+    }
+    #chartContainer {
+      margin: 20px auto;
+      max-width: 700px;
+      display: none; /* Hide the chart by default */
+    }
+    #expenseOverviewTitle {
+      display: none; /* Hide the title by default */
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 15px;
+      font-size: 16px;
+      color: white;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+    .footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .form-container input,
+    .form-container select,
+    .form-container button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div>
+      <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+    {% if user %}
+      <div>Welcome, {{ user.username }}</div>
+    {% else %}
+      <p>You are not logged in. <a href="{{ url_for('auth.login') }}">Login</a></p>
+    {% endif %}
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1>Expense Tracker Dashboard</h1>
+
+    <!-- Add Transaction Form -->
+    <div class="overview">
+      <div class="form-container">
+        <form action="{{ url_for('transactions.add_transaction') }}" method="POST">
+          <input type="number" name="amount" placeholder="Amount" required>
+          <input type="text" name="category" placeholder="Category ID" required>
+          <input type="text" name="description" placeholder="Description">
+          <input type="date" name="date" required>
+          <select name="type" required>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+          <button type="submit" class="button">Add Transaction</button>
+        </form>
+      </div>
+      <button class="button" onclick="toggleChart()">View Reports</button>
+      <button class="button" onclick="window.location.href='{{ url_for('dashboard') }}'">Manage Categories</button>
+    </div>
+
+    <!-- Chart Section -->
+    <h2 id="expenseOverviewTitle">Expense Overview</h2>
+    <div id="chartContainer">
+      <canvas id="expenseChart"></canvas>
+    </div>
+
+    <!-- Transaction History Table -->
+    <h2>Transaction History</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Amount</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Date</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for transaction in transactions %}
+          <tr>
+            <td>${{ transaction.amount }}</td>
+            <td>{{ transaction.category_id }}</td>
+            <td>{{ transaction.description }}</td>
+            <td>{{ transaction.date }}</td>
+            <td>{{ transaction.type | capitalize }}</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5" style="text-align:center">No transactions found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Expense Tracker App | Rakshit Kumar [22BCE8424]
+  </div>
+
+  <!-- Chart.js Script -->
+  <script>
+    let chartInitialized = false;
+
+    function toggleChart() {
+      const chartContainer = document.getElementById('chartContainer');
+      const expenseOverviewTitle = document.getElementById('expenseOverviewTitle');
+      const chartIsVisible = chartContainer.style.display === 'block';
+
+      if (!chartIsVisible && !chartInitialized) {
+        // Initialize the chart only once
+        const ctx = document.getElementById('expenseChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: {{ chart_labels | tojson | default('[]') }},
+            datasets: [{
+              label: 'Total Expenses',
+              data: {{ chart_values | tojson | default('[]') }},
+              backgroundColor: 'rgba(75, 192, 192, 0.6)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+        chartInitialized = true;
+      }
+
+      // Toggle visibility of the chart and title
+      chartContainer.style.display = chartIsVisible ? 'none' : 'block';
+      expenseOverviewTitle.style.display = chartIsVisible ? 'none' : 'block';
+    }
+  </script>
+</body>
+</html>
